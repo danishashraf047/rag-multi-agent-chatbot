@@ -27,6 +27,7 @@ const elements = {
   sendButton: document.querySelector("#sendButton"),
   connectionStatus: document.querySelector("#connectionStatus"),
   activeAgent: document.querySelector("#activeAgent"),
+  routeStatus: document.querySelector("#routeStatus"),
 };
 
 function loadSessions() {
@@ -137,9 +138,10 @@ function setRunning(isRunning) {
 
 function resetAgentStrip() {
   document.querySelectorAll(".agent-step").forEach((node) => {
-    node.classList.remove("active", "done");
+    node.classList.remove("active", "done", "skipped");
   });
   elements.activeAgent.textContent = "No agent running";
+  elements.routeStatus.textContent = "Waiting for request";
 }
 
 function markAgent(agentName, status = "active") {
@@ -151,8 +153,22 @@ function markAgent(agentName, status = "active") {
     node.classList.remove("active");
     node.classList.add("done");
   });
+  agentNode.classList.remove("skipped");
   agentNode.classList.add(status);
   elements.activeAgent.textContent = `${labelFor(agentName)} agent working`;
+  elements.routeStatus.textContent = `${labelFor(agentName)} running`;
+}
+
+function markRoute(routeName) {
+  const specialistAgents = ["planning", "research", "coding", "rag"];
+  specialistAgents.forEach((agentName) => {
+    const node = document.querySelector(`[data-agent="${agentName}"]`);
+    if (!node) {
+      return;
+    }
+    node.classList.toggle("skipped", routeName !== agentName);
+  });
+  elements.routeStatus.textContent = `Route: ${labelFor(routeName)}`;
 }
 
 async function sendMessage(message) {
@@ -187,6 +203,7 @@ async function sendMessage(message) {
       node.classList.add("done");
     });
     elements.activeAgent.textContent = "No agent running";
+    elements.routeStatus.textContent = "Completed";
     setRunning(false);
   }
 }
@@ -226,6 +243,7 @@ function handleSseFrame(frame) {
   }
 
   if (update.event === "supervisor" && update.data?.route) {
+    markRoute(update.data.route);
     addMessage("system", `Supervisor routed this request to: ${update.data.route}`);
   }
 

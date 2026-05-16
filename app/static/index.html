@@ -35,30 +35,40 @@
           <div id="connectionStatus" class="status-pill">Ready</div>
         </header>
 
-        <section class="agent-strip" aria-label="Agent activity">
-          <div class="agent-step" data-agent="supervisor">
-            <span></span>
-            <strong>Supervisor</strong>
+        <section class="workflow-panel" aria-label="Agent workflow">
+          <div class="workflow-heading">
+            <div>
+              <p class="eyebrow">Workflow</p>
+              <h3>Agent routing</h3>
+            </div>
+            <div id="routeStatus" class="route-status">Waiting for request</div>
           </div>
-          <div class="agent-step" data-agent="planning">
-            <span></span>
-            <strong>Planning</strong>
-          </div>
-          <div class="agent-step" data-agent="research">
-            <span></span>
-            <strong>Research</strong>
-          </div>
-          <div class="agent-step" data-agent="coding">
-            <span></span>
-            <strong>Coding</strong>
-          </div>
-          <div class="agent-step" data-agent="rag">
-            <span></span>
-            <strong>RAG</strong>
-          </div>
-          <div class="agent-step" data-agent="aggregate">
-            <span></span>
-            <strong>Aggregate</strong>
+
+          <div class="agent-strip" aria-label="Agent activity">
+            <div class="agent-step" data-agent="supervisor">
+              <span>1</span>
+              <strong>Supervisor</strong>
+            </div>
+            <div class="agent-step" data-agent="planning">
+              <span>2</span>
+              <strong>Planning</strong>
+            </div>
+            <div class="agent-step" data-agent="research">
+              <span>3</span>
+              <strong>Research</strong>
+            </div>
+            <div class="agent-step" data-agent="coding">
+              <span>4</span>
+              <strong>Coding</strong>
+            </div>
+            <div class="agent-step" data-agent="rag">
+              <span>5</span>
+              <strong>RAG</strong>
+            </div>
+            <div class="agent-step" data-agent="aggregate">
+              <span>6</span>
+              <strong>Aggregate</strong>
+            </div>
           </div>
         </section>
 

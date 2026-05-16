@@ -251,6 +251,7 @@ project-root/
 │   ├── graph/
 │   ├── memory/
 │   ├── rag/
+│   ├── static/
 │   ├── tools/
 │   └── main.py
 ├── data/documents/

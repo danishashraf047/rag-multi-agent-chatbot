@@ -21,6 +21,13 @@ def test_health_endpoint():
     assert response.json()["status"] == "ok"
 
 
+def test_ui_index_is_served():
+    client = TestClient(create_app())
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "Agent Console" in response.text
+
+
 def test_chat_endpoint_with_dependency_override():
     app = create_app()
     app.dependency_overrides[get_workflow] = lambda: FakeWorkflow()

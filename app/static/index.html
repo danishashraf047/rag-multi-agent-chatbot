@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Multi-Agent Chat</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="sessions-panel">
+        <div class="brand">
+          <div class="mark">LG</div>
+          <div>
+            <h1>Agent Console</h1>
+            <p>LangGraph sessions</p>
+          </div>
+        </div>
+
+        <button id="newSessionButton" class="primary-button" type="button">New session</button>
+
+        <div class="session-list-header">
+          <span>Sessions</span>
+          <button id="clearSessionsButton" class="ghost-button" type="button">Clear</button>
+        </div>
+        <nav id="sessionList" class="session-list" aria-label="Conversation sessions"></nav>
+      </aside>
+
+      <section class="chat-panel">
+        <header class="chat-header">
+          <div>
+            <p class="eyebrow">Current session</p>
+            <h2 id="sessionTitle">New conversation</h2>
+          </div>
+          <div id="connectionStatus" class="status-pill">Ready</div>
+        </header>
+
+        <section class="agent-strip" aria-label="Agent activity">
+          <div class="agent-step" data-agent="supervisor">
+            <span></span>
+            <strong>Supervisor</strong>
+          </div>
+          <div class="agent-step" data-agent="planning">
+            <span></span>
+            <strong>Planning</strong>
+          </div>
+          <div class="agent-step" data-agent="research">
+            <span></span>
+            <strong>Research</strong>
+          </div>
+          <div class="agent-step" data-agent="coding">
+            <span></span>
+            <strong>Coding</strong>
+          </div>
+          <div class="agent-step" data-agent="rag">
+            <span></span>
+            <strong>RAG</strong>
+          </div>
+          <div class="agent-step" data-agent="aggregate">
+            <span></span>
+            <strong>Aggregate</strong>
+          </div>
+        </section>
+
+        <section id="messages" class="messages" aria-live="polite"></section>
+
+        <form id="chatForm" class="composer">
+          <textarea
+            id="messageInput"
+            rows="3"
+            placeholder="Ask for research, code, planning, or a knowledge-base answer..."
+            required
+          ></textarea>
+          <div class="composer-actions">
+            <div id="activeAgent" class="active-agent">No agent running</div>
+            <button id="sendButton" class="primary-button" type="submit">Send</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

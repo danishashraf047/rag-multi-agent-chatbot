@@ -73,7 +73,7 @@ LANGSMITH_PROJECT=rag-multi-agent-chatbot
 
 ```bash
 source .venv/bin/activate
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 Open:
@@ -83,10 +83,16 @@ Open:
 
 ## Example API Requests
 
-Chat:
+Health check:
 
 ```bash
-curl -X POST http://localhost:8000/api/v1/chat \
+curl http://127.0.0.1:8000/api/v1/health
+```
+
+General chat through the supervisor:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/chat \
   -H "Content-Type: application/json" \
   -d '{
     "session_id": "demo",
@@ -94,10 +100,43 @@ curl -X POST http://localhost:8000/api/v1/chat \
   }'
 ```
 
+Test the Planning Agent:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": "demo-planning",
+    "message": "Create a step-by-step execution plan for building a React dashboard with a FastAPI backend, authentication, tests, and deployment"
+  }'
+```
+
+Test the Coding Agent:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": "demo-coding",
+    "message": "Write a Python FastAPI endpoint that accepts a user message and returns a JSON response. Explain the implementation."
+  }'
+```
+
+Test the Research Agent:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": "demo-research",
+    "message": "Research FastAPI deployment options and summarize the tradeoffs"
+  }'
+```
+
 Streaming:
 
 ```bash
-curl -N -X POST http://localhost:8000/api/v1/chat/stream \
+curl -N -X POST http://127.0.0.1:8000/api/v1/chat/stream \
   -H "Content-Type: application/json" \
   -d '{
     "session_id": "demo",
@@ -108,7 +147,7 @@ curl -N -X POST http://localhost:8000/api/v1/chat/stream \
 Ingest text into ChromaDB:
 
 ```bash
-curl -X POST http://localhost:8000/api/v1/rag/ingest \
+curl -X POST http://127.0.0.1:8000/api/v1/rag/ingest \
   -H "Content-Type: application/json" \
   -d '{
     "texts": [
@@ -120,14 +159,14 @@ curl -X POST http://localhost:8000/api/v1/rag/ingest \
   }'
 ```
 
-Ask the RAG agent:
+Test the RAG Agent:
 
 ```bash
-curl -X POST http://localhost:8000/api/v1/chat \
+curl -X POST http://127.0.0.1:8000/api/v1/chat \
   -H "Content-Type: application/json" \
   -d '{
     "session_id": "demo",
-    "message": "Using the indexed knowledge base, what does LangGraph orchestrate?"
+    "message": "Using the indexed knowledge base, what is LangGraph used for?"
   }'
 ```
 
@@ -136,10 +175,52 @@ Ingest local files:
 ```bash
 mkdir -p data/documents
 printf "FastAPI supports async endpoints and dependency injection." > data/documents/fastapi.md
-curl -X POST http://localhost:8000/api/v1/rag/ingest \
+curl -X POST http://127.0.0.1:8000/api/v1/rag/ingest \
   -H "Content-Type: application/json" \
   -d '{"paths": ["data/documents/fastapi.md"]}'
 ```
+
+The Supervisor Agent chooses the route automatically. In each `/chat` response, check the `route` field to confirm whether LangGraph sent the request to `planning`, `coding`, `research`, `rag`, or `direct`.
+
+## VS Code Debugging
+
+This repo includes shared VS Code debugger settings in `.vscode/`.
+
+Recommended extensions:
+
+- Python
+- Pylance
+
+Setup:
+
+```bash
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+```
+
+Make sure `.env` contains a real `OPENAI_API_KEY`.
+
+In VS Code:
+
+1. Open the project folder.
+2. Select the Python interpreter at `.venv/bin/python`.
+3. Open Run and Debug.
+4. Choose `FastAPI: Debug app`.
+5. Press Start Debugging.
+
+Available debug configurations:
+
+- `FastAPI: Debug app`: starts `uvicorn app.main:app --reload` on `127.0.0.1:8000`.
+- `Pytest: Current file`: debugs the currently open test file.
+- `Pytest: All tests`: debugs the full test suite.
+
+Useful breakpoint locations:
+
+- `app/graph/workflow.py`: `_supervisor`, `_route_from_state`, and `_aggregate`
+- `app/agents/supervisor.py`: `decide`
+- `app/agents/rag_agent.py`: `run`
+- `app/api/routes.py`: `chat` and `chat_stream`
 
 ## Docker
 

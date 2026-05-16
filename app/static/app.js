@@ -32,6 +32,7 @@ const elements = {
   ragFileLabel: document.querySelector("#ragFileLabel"),
   ingestFileButton: document.querySelector("#ingestFileButton"),
   ingestStatus: document.querySelector("#ingestStatus"),
+  ingestPanel: document.querySelector(".ingest-panel"),
 };
 
 function loadSessions() {
@@ -145,7 +146,7 @@ function resetAgentStrip() {
     node.classList.remove("active", "done", "skipped");
   });
   elements.activeAgent.textContent = "No agent running";
-  elements.routeStatus.textContent = "Waiting for request";
+  setRouteStatus("Waiting for request");
 }
 
 function markAgent(agentName, status = "active") {
@@ -160,7 +161,7 @@ function markAgent(agentName, status = "active") {
   agentNode.classList.remove("skipped");
   agentNode.classList.add(status);
   elements.activeAgent.textContent = `${labelFor(agentName)} agent working`;
-  elements.routeStatus.textContent = `${labelFor(agentName)} running`;
+  setRouteStatus(`${labelFor(agentName)} running`);
 }
 
 function markRoute(routeName) {
@@ -172,7 +173,15 @@ function markRoute(routeName) {
     }
     node.classList.toggle("skipped", routeName !== agentName);
   });
-  elements.routeStatus.textContent = `Route: ${labelFor(routeName)}`;
+  setRouteStatus(`Route: ${labelFor(routeName)}`);
+}
+
+function setRouteStatus(text) {
+  elements.routeStatus.textContent = text;
+  elements.routeStatus.classList.remove("updated");
+  requestAnimationFrame(() => {
+    elements.routeStatus.classList.add("updated");
+  });
 }
 
 async function sendMessage(message) {
@@ -207,7 +216,7 @@ async function sendMessage(message) {
       node.classList.add("done");
     });
     elements.activeAgent.textContent = "No agent running";
-    elements.routeStatus.textContent = "Completed";
+    setRouteStatus("Completed");
     setRunning(false);
   }
 }
@@ -271,6 +280,7 @@ async function ingestSelectedFile() {
   }
 
   elements.ingestFileButton.disabled = true;
+  elements.ingestPanel.classList.add("ingesting");
   elements.ingestStatus.className = "ingest-status";
   elements.ingestStatus.textContent = `Ingesting ${file.name}...`;
 
@@ -298,6 +308,7 @@ async function ingestSelectedFile() {
     elements.ingestStatus.textContent = error.message;
     addMessage("system", `RAG file ingestion failed: ${error.message}`);
   } finally {
+    elements.ingestPanel.classList.remove("ingesting");
     elements.ingestFileButton.disabled = !elements.ragFileInput.files?.length;
   }
 }

@@ -15,7 +15,9 @@ class PlanningAgent(BaseAgent):
                     SystemMessage(
                         content=(
                             "You are a planning agent. Break complex work into ordered subtasks. "
-                            "Assign each subtask to research, coding, rag, supervisor, or human."
+                            "Assign delegation items to one of these routes only: research, coding, "
+                            "rag, planning, or direct. Include empty arrays if there are no risks or "
+                            "delegation items."
                         ),
                     ),
                     HumanMessage(content=query),

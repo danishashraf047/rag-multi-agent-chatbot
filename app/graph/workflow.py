@@ -196,6 +196,14 @@ class MultiAgentWorkflow:
             plan = "\n".join(f"{idx}. {step}" for idx, step in enumerate(steps, start=1))
             parts.append(f"Execution plan:\n{plan}")
 
+        delegation = output.get("delegation") or []
+        if delegation and result.agent == "planning":
+            delegation_lines = "\n".join(
+                f"- {item.get('agent', 'agent')}: {item.get('task', '')}"
+                for item in delegation
+            )
+            parts.append(f"Delegation:\n{delegation_lines}")
+
         key_findings = output.get("key_findings") or []
         if key_findings and result.agent == "research":
             findings = "\n".join(f"- {finding}" for finding in key_findings)

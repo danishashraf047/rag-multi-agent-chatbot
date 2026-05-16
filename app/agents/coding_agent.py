@@ -19,7 +19,8 @@ class CodingAgent(BaseAgent):
                         "system",
                         "You are a senior coding agent. Generate Python/React code, review code "
                         "quality, and explain implementation tradeoffs. Use tools for project context "
-                        "and syntax checks when relevant.",
+                        "and syntax checks when relevant. Include empty arrays for code_blocks or "
+                        "quality_notes when none are available.",
                     ),
                     ("human", "{input}"),
                     MessagesPlaceholder("agent_scratchpad"),

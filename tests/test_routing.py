@@ -1,5 +1,5 @@
 from app.graph.workflow import MultiAgentWorkflow
-from app.models import AgentResult, AgentRoute
+from app.models import AgentResult, AgentRoute, PlanOutput
 
 
 def test_route_from_state_without_constructing_workflow():
@@ -33,3 +33,10 @@ def test_format_agent_result_includes_coding_blocks():
     assert "```python" in formatted
     assert "def add" in formatted
     assert "Quality notes:" in formatted
+
+
+def test_plan_output_schema_requires_every_property():
+    schema = PlanOutput.model_json_schema()
+
+    assert set(schema["required"]) == set(schema["properties"])
+    assert schema["properties"]["delegation"]["type"] == "array"

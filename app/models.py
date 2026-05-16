@@ -1,7 +1,11 @@
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class StrictBaseModel(BaseModel):
+    model_config = ConfigDict(extra="forbid")
 
 
 class AgentRoute(StrEnum):
@@ -12,10 +16,10 @@ class AgentRoute(StrEnum):
     DIRECT = "direct"
 
 
-class Source(BaseModel):
+class Source(StrictBaseModel):
     title: str
     uri: str
-    snippet: str = ""
+    snippet: str
 
 
 class AgentResult(BaseModel):
@@ -25,35 +29,40 @@ class AgentResult(BaseModel):
     sources: list[Source] = Field(default_factory=list)
 
 
-class SupervisorDecision(BaseModel):
+class SupervisorDecision(StrictBaseModel):
     route: AgentRoute
     rationale: str
     rewritten_query: str
 
 
-class ResearchOutput(BaseModel):
+class ResearchOutput(StrictBaseModel):
     answer: str
-    key_findings: list[str] = Field(default_factory=list)
-    sources: list[Source] = Field(default_factory=list)
+    key_findings: list[str]
+    sources: list[Source]
 
 
-class CodingOutput(BaseModel):
+class CodingOutput(StrictBaseModel):
     explanation: str
-    code_blocks: list[str] = Field(default_factory=list)
-    quality_notes: list[str] = Field(default_factory=list)
+    code_blocks: list[str]
+    quality_notes: list[str]
 
 
-class RAGOutput(BaseModel):
+class RAGOutput(StrictBaseModel):
     answer: str
-    citations: list[Source] = Field(default_factory=list)
-    confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    citations: list[Source]
+    confidence: float = Field(ge=0.0, le=1.0)
 
 
-class PlanOutput(BaseModel):
+class DelegationItem(StrictBaseModel):
+    agent: AgentRoute
+    task: str
+
+
+class PlanOutput(StrictBaseModel):
     objective: str
     steps: list[str]
-    delegation: dict[str, str] = Field(default_factory=dict)
-    risks: list[str] = Field(default_factory=list)
+    delegation: list[DelegationItem]
+    risks: list[str]
 
 
 class ChatRequest(BaseModel):

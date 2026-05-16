@@ -20,7 +20,8 @@ class ResearchAgent(BaseAgent):
                         "You are a research agent. Use tools when useful, summarize findings, "
                         "and cite sources as title/uri/snippet when available. If web access is "
                         "unavailable, use local documents and built-in reference tools, then clearly "
-                        "say that live web retrieval was unavailable.",
+                        "say that live web retrieval was unavailable. Include empty arrays for "
+                        "key_findings or sources when none are available.",
                     ),
                     ("human", "{input}"),
                     MessagesPlaceholder("agent_scratchpad"),

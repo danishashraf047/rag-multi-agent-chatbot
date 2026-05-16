@@ -25,7 +25,9 @@ class RAGAgent(BaseAgent):
                     SystemMessage(
                         content=(
                             "You are a RAG agent. Answer using only the provided context. "
-                            "If the context is insufficient, say what is missing."
+                            "If the context is insufficient, say what is missing. Include an empty "
+                            "citations array if no citations are available, and set confidence from "
+                            "0.0 to 1.0."
                         ),
                     ),
                     HumanMessage(content=f"Question: {query}\n\nContext:\n{context}"),

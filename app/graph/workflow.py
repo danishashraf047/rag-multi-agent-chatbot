@@ -165,7 +165,7 @@ class MultiAgentWorkflow:
         if state.get("error") and not outputs:
             final = f"The {state.get('route', 'agent')} agent failed: {state['error']}"
         elif outputs:
-            final = "\n\n".join(result.summary for result in outputs)
+            final = "\n\n".join(self._format_agent_result(result) for result in outputs)
         else:
             final = "I could not produce an answer."
 
@@ -174,6 +174,49 @@ class MultiAgentWorkflow:
             "final_response": final,
             "messages": [AIMessage(content=final)],
         }
+
+    @staticmethod
+    def _format_agent_result(result: AgentResult) -> str:
+        output = result.output or {}
+        parts = [result.summary]
+
+        code_blocks = output.get("code_blocks") or []
+        if code_blocks:
+            parts.append(
+                "\n\n".join(MultiAgentWorkflow._format_code_block(block) for block in code_blocks),
+            )
+
+        quality_notes = output.get("quality_notes") or []
+        if quality_notes:
+            notes = "\n".join(f"- {note}" for note in quality_notes)
+            parts.append(f"Quality notes:\n{notes}")
+
+        steps = output.get("steps") or []
+        if steps and result.agent == "planning":
+            plan = "\n".join(f"{idx}. {step}" for idx, step in enumerate(steps, start=1))
+            parts.append(f"Execution plan:\n{plan}")
+
+        key_findings = output.get("key_findings") or []
+        if key_findings and result.agent == "research":
+            findings = "\n".join(f"- {finding}" for finding in key_findings)
+            parts.append(f"Key findings:\n{findings}")
+
+        sources = result.sources or []
+        if sources:
+            source_lines = "\n".join(f"- {source.title}: {source.uri}" for source in sources)
+            parts.append(f"Sources:\n{source_lines}")
+
+        return "\n\n".join(part for part in parts if part)
+
+    @staticmethod
+    def _format_code_block(block: str) -> str:
+        language = "python"
+        stripped = block.strip()
+        if stripped.startswith("```"):
+            return stripped
+        if "import React" in stripped or "export default" in stripped:
+            language = "tsx"
+        return f"```{language}\n{stripped}\n```"
 
     def _jsonable(self, payload):
         if isinstance(payload, dict):

@@ -81,6 +81,7 @@ function addMessage(role, content) {
   saveSessions();
   renderMessages(session);
   renderSessions();
+  scrollMessagesToBottom();
 }
 
 function render() {
@@ -117,7 +118,13 @@ function renderMessages(session) {
     bubble.textContent = message.content;
     elements.messages.appendChild(bubble);
   }
-  elements.messages.scrollTop = elements.messages.scrollHeight;
+  scrollMessagesToBottom();
+}
+
+function scrollMessagesToBottom() {
+  requestAnimationFrame(() => {
+    elements.messages.scrollTop = elements.messages.scrollHeight;
+  });
 }
 
 function setRunning(isRunning) {
@@ -265,6 +272,14 @@ elements.chatForm.addEventListener("submit", (event) => {
   }
   elements.messageInput.value = "";
   sendMessage(message);
+});
+
+elements.messageInput.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" || event.shiftKey) {
+    return;
+  }
+  event.preventDefault();
+  elements.chatForm.requestSubmit();
 });
 
 render();

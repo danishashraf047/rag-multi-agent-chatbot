@@ -62,5 +62,26 @@ class VectorStoreService:
             await self.store.aadd_documents(chunks)
         return len(chunks)
 
+    async def ingest_file_content(
+        self,
+        filename: str,
+        content: bytes,
+        content_type: str | None = None,
+    ) -> int:
+        text = content.decode("utf-8", errors="ignore").strip()
+        if not text:
+            raise ValueError("Uploaded file does not contain readable UTF-8 text.")
+
+        return await self.ingest_texts(
+            [text],
+            [
+                {
+                    "source": f"upload://{filename}",
+                    "title": filename,
+                    "content_type": content_type or "application/octet-stream",
+                },
+            ],
+        )
+
     async def retrieve(self, query: str, k: int = 5) -> list[Document]:
         return await self.store.asimilarity_search(query, k=k)

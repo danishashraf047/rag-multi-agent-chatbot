@@ -180,6 +180,22 @@ curl -X POST http://127.0.0.1:8000/api/v1/rag/ingest \
   -d '{"paths": ["data/documents/fastapi.md"]}'
 ```
 
+Upload and ingest a file from the UI:
+
+1. Open [http://127.0.0.1:8000](http://127.0.0.1:8000).
+2. Use `Knowledge base -> Ingest file` in the left sidebar.
+3. Select a text-like file, then click `Ingest for RAG`.
+4. Ask a knowledge-base question in chat.
+
+Upload and ingest a file with curl:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/rag/ingest/file \
+  -F "file=@data/documents/fastapi.md"
+```
+
+Supported upload types include `.txt`, `.md`, `.py`, `.js`, `.ts`, `.json`, `.csv`, `.yaml`, `.html`, and `.css`. The default upload limit is 2 MB.
+
 The Supervisor Agent chooses the route automatically. In each `/chat` response, check the `route` field to confirm whether LangGraph sent the request to `planning`, `coding`, `research`, `rag`, or `direct`.
 
 ## VS Code Debugging

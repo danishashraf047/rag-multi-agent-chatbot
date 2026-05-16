@@ -1,4 +1,4 @@
-from app.api.dependencies import get_workflow
+from app.api.dependencies import get_vector_store, get_workflow
 from app.main import create_app
 from app.models import AgentRoute, ChatResponse
 from fastapi.testclient import TestClient
@@ -12,6 +12,14 @@ class FakeWorkflow:
             response=f"handled: {message}",
             agent_outputs=[],
         )
+
+
+class FakeVectorStore:
+    async def ingest_file_content(self, filename: str, content: bytes, content_type: str | None):
+        assert filename == "notes.md"
+        assert b"LangGraph" in content
+        assert content_type in {"text/markdown", "text/plain"}
+        return 2
 
 
 def test_health_endpoint():
@@ -42,3 +50,18 @@ def test_chat_endpoint_with_dependency_override():
     body = response.json()
     assert body["route"] == "coding"
     assert body["response"] == "handled: Write a FastAPI route"
+
+
+def test_rag_file_upload_endpoint_with_dependency_override():
+    app = create_app()
+    app.dependency_overrides[get_vector_store] = lambda: FakeVectorStore()
+    client = TestClient(app)
+
+    response = client.post(
+        "/api/v1/rag/ingest/file",
+        files={"file": ("notes.md", b"LangGraph routes agents.", "text/markdown")},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["indexed_documents"] == 2

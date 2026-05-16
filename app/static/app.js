@@ -28,6 +28,10 @@ const elements = {
   connectionStatus: document.querySelector("#connectionStatus"),
   activeAgent: document.querySelector("#activeAgent"),
   routeStatus: document.querySelector("#routeStatus"),
+  ragFileInput: document.querySelector("#ragFileInput"),
+  ragFileLabel: document.querySelector("#ragFileLabel"),
+  ingestFileButton: document.querySelector("#ingestFileButton"),
+  ingestStatus: document.querySelector("#ingestStatus"),
 };
 
 function loadSessions() {
@@ -260,6 +264,44 @@ function labelFor(agentName) {
   return agentName.charAt(0).toUpperCase() + agentName.slice(1);
 }
 
+async function ingestSelectedFile() {
+  const file = elements.ragFileInput.files?.[0];
+  if (!file) {
+    return;
+  }
+
+  elements.ingestFileButton.disabled = true;
+  elements.ingestStatus.className = "ingest-status";
+  elements.ingestStatus.textContent = `Ingesting ${file.name}...`;
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const response = await fetch("/api/v1/rag/ingest/file", {
+      method: "POST",
+      body: formData,
+    });
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(payload.detail || `Upload failed with status ${response.status}`);
+    }
+
+    elements.ingestStatus.className = "ingest-status success";
+    elements.ingestStatus.textContent = `${file.name} indexed into ${payload.indexed_documents} chunks`;
+    addMessage(
+      "system",
+      `Ingested ${file.name} into the RAG knowledge base (${payload.indexed_documents} chunks).`,
+    );
+  } catch (error) {
+    elements.ingestStatus.className = "ingest-status error";
+    elements.ingestStatus.textContent = error.message;
+    addMessage("system", `RAG file ingestion failed: ${error.message}`);
+  } finally {
+    elements.ingestFileButton.disabled = !elements.ragFileInput.files?.length;
+  }
+}
+
 function escapeHtml(value) {
   return value.replace(/[&<>"']/g, (char) => {
     const entities = {
@@ -281,6 +323,16 @@ elements.clearSessionsButton.addEventListener("click", () => {
   resetAgentStrip();
   render();
 });
+
+elements.ragFileInput.addEventListener("change", () => {
+  const file = elements.ragFileInput.files?.[0];
+  elements.ragFileLabel.textContent = file ? file.name : "Choose a text file";
+  elements.ingestFileButton.disabled = !file;
+  elements.ingestStatus.className = "ingest-status";
+  elements.ingestStatus.textContent = file ? `${file.name} ready to ingest` : "No file selected";
+});
+
+elements.ingestFileButton.addEventListener("click", ingestSelectedFile);
 
 elements.chatForm.addEventListener("submit", (event) => {
   event.preventDefault();

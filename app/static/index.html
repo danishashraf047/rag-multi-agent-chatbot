@@ -19,6 +19,25 @@
 
         <button id="newSessionButton" class="primary-button" type="button">New session</button>
 
+        <section class="ingest-panel" aria-label="RAG file ingestion">
+          <div>
+            <p class="eyebrow">Knowledge base</p>
+            <h2>Ingest file</h2>
+          </div>
+          <label class="file-picker">
+            <input
+              id="ragFileInput"
+              type="file"
+              accept=".txt,.md,.markdown,.py,.js,.jsx,.ts,.tsx,.json,.csv,.yaml,.yml,.html,.css"
+            />
+            <span id="ragFileLabel">Choose a text file</span>
+          </label>
+          <button id="ingestFileButton" class="secondary-button" type="button" disabled>
+            Ingest for RAG
+          </button>
+          <p id="ingestStatus" class="ingest-status">No file selected</p>
+        </section>
+
         <div class="session-list-header">
           <span>Sessions</span>
           <button id="clearSessionsButton" class="ghost-button" type="button">Clear</button>

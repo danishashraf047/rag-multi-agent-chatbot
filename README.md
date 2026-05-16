@@ -170,14 +170,23 @@ curl -X POST http://127.0.0.1:8000/api/v1/chat \
   }'
 ```
 
-Ingest local files:
+Ingest the included sample knowledge file:
 
 ```bash
-mkdir -p data/documents
-printf "FastAPI supports async endpoints and dependency injection." > data/documents/fastapi.md
 curl -X POST http://127.0.0.1:8000/api/v1/rag/ingest \
   -H "Content-Type: application/json" \
-  -d '{"paths": ["data/documents/fastapi.md"]}'
+  -d '{"paths": ["data/documents/sample-knowledge.md"]}'
+```
+
+Then ask a sample knowledge-base question:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": "sample-rag",
+    "message": "Using the knowledge base, what does LangGraph do in this project?"
+  }'
 ```
 
 Upload and ingest a file from the UI:
@@ -191,7 +200,7 @@ Upload and ingest a file with curl:
 
 ```bash
 curl -X POST http://127.0.0.1:8000/api/v1/rag/ingest/file \
-  -F "file=@data/documents/fastapi.md"
+  -F "file=@data/documents/sample-knowledge.md"
 ```
 
 Supported upload types include `.txt`, `.md`, `.py`, `.js`, `.ts`, `.json`, `.csv`, `.yaml`, `.html`, and `.css`. The default upload limit is 2 MB.

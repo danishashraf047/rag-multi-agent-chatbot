@@ -35,6 +35,7 @@ htmlcov/
 chroma_db/
 data/documents/*
 !data/documents/.gitkeep
+!data/documents/sample-knowledge.md
 *.sqlite
 *.sqlite3
 *.db
